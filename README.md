@@ -1,4 +1,5 @@
-<img width="827" height="582" alt="image" src="https://github.com/user-attachments/assets/764746b5-2287-424b-a56f-46a6cbd83f3c" /><img width="1058" height="731" alt="image" src="https://github.com/user-attachments/assets/a5024231-46b8-4154-b60a-d2e69d1b2094" />🔗 SnapLink — URL Shortener with Analytics
+
+🔗 SnapLink — URL Shortener with Analytics
 
 A full-stack URL shortener platform with real-time analytics, QR code generation, and a beautiful dark dashboard.
 🎥 Demo Video
@@ -23,6 +24,7 @@ Bonus Features
 
 
 
+![Uploading image.png…]()
 
 
 🗂️ Project Structure
