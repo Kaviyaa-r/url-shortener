@@ -22,9 +22,8 @@ Bonus Features
 🌐 Device & Browser Tracking — See what devices/browsers visitors use
 
 
+<img width="827" height="582" alt="image" src="https://github.com/user-attachments/assets/cd7fa6f7-4a5f-4d66-8442-03527ca02510" />
 
-
-![Uploading image.png…]()
 
 
 🗂️ Project Structure
