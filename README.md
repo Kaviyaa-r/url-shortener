@@ -27,52 +27,8 @@ Bonus Features
 
 
 🗂️ Project Structure
-url-shortener/
-├── backend/
-│   ├── src/
-│   │   ├── models/
-│   │   │   ├── User.js          # User schema with bcrypt hashing
-│   │   │   ├── Url.js           # URL schema with click tracking
-│   │   │   └── Visit.js         # Individual visit records
-│   │   ├── routes/
-│   │   │   ├── auth.js          # POST /signup, POST /login
-│   │   │   ├── urls.js          # CRUD for shortened URLs
-│   │   │   ├── analytics.js     # Visit history and trend data
-│   │   │   └── redirect.js      # Short URL redirect handler
-│   │   ├── middleware/
-│   │   │   └── auth.js          # JWT verify middleware
-│   │   ├── controllers/
-│   │   │   ├── authController.js
-│   │   │   ├── urlController.js
-│   │   │   └── analyticsController.js
-│   │   └── server.js            # Express app entry point
-│   ├── .env                     # Environment variables (not committed)
-│   ├── .env.example             # Template for env vars
-│   └── package.json
-│
-├── frontend/
-│   ├── src/
-│   │   ├── pages/
-│   │   │   ├── Login.jsx        # Login page
-│   │   │   ├── Signup.jsx       # Signup page
-│   │   │   ├── Dashboard.jsx    # Main URL management dashboard
-│   │   │   └── Analytics.jsx    # Per-URL analytics detail page
-│   │   ├── components/
-│   │   │   ├── Navbar.jsx       # Top navigation bar
-│   │   │   ├── UrlCard.jsx      # URL item with copy/delete/QR
-│   │   │   ├── CreateUrlModal.jsx # New URL creation form
-│   │   │   ├── QRModal.jsx      # QR code display modal
-│   │   │   └── ClickChart.jsx   # Recharts daily click bar chart
-│   │   ├── context/
-│   │   │   └── AuthContext.jsx  # Global auth state (React Context)
-│   │   ├── api/
-│   │   │   └── axios.js         # Axios instance with auth headers
-│   │   ├── App.jsx              # Routes and layout
-│   │   └── main.jsx             # React entry point
-│   ├── tailwind.config.js
-│   └── package.json
-│
-└── README.md
+<img width="483" height="888" alt="image" src="https://github.com/user-attachments/assets/f3a913be-d48f-4c3a-a2a2-20caead237cb" />
+
 
 🚀 Setup Instructions
 Prerequisites
