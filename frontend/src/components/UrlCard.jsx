@@ -1,190 +1,184 @@
-// Import React library and useState hook to manage copy and delete actions
 import React, { useState } from 'react';
-// Import useNavigate hook to redirect pages to the analytics dashboard
 import { useNavigate } from 'react-router-dom';
-// Import graphics and layout icons from the lucide-react library
-import { Copy, Check, QrCode, BarChart3, Trash2, Calendar, MousePointerClick } from 'lucide-react';
-// Import toast notification client to present alert banners
+import { Copy, Check, QrCode, BarChart2, Trash2, Calendar } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
-// Define the UrlCard component which renders information for each link
+const glassCard = {
+  background: 'rgba(255,255,255,0.03)',
+  backdropFilter: 'blur(20px)',
+  WebkitBackdropFilter: 'blur(20px)',
+  border: '1px solid rgba(255,255,255,0.08)',
+  borderTop: '1px solid rgba(255,255,255,0.15)',
+  borderRadius: '16px',
+  boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+};
+
+const gradientText = {
+  background: 'linear-gradient(90deg, #818cf8, #c084fc)',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  backgroundClip: 'text',
+};
+
+const glassBtn = {
+  background: 'rgba(255,255,255,0.05)',
+  border: '1px solid rgba(255,255,255,0.1)',
+  borderRadius: '8px',
+  color: '#94a3b8',
+  cursor: 'pointer',
+  width: '32px',
+  height: '32px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  transition: 'all 0.2s ease',
+  padding: 0,
+};
+
 const UrlCard = ({ url, onDelete, onShowQR }) => {
-  // Local state to manage copy action status feedback
   const [copied, setCopied] = useState(false);
-  // Local state to indicate if deletion process is loading
   const [deleting, setDeleting] = useState(false);
-  // Instantiate navigate hook to route views
+  const [hovered, setHovered] = useState(false);
   const navigate = useNavigate();
 
-  // Format creation timestamp into readable layout (e.g. Jan 12, 2026)
   const formatDate = (dateString) => {
-    // Instantiate date constructor from ISO string
     const date = new Date(dateString);
-    // Return formatted string matching local specifications
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
-  // Copy handler to send the shortened link directly to system clipboard
   const handleCopy = async () => {
     try {
-      // Write shortUrl string parameter to system clipboard
       await navigator.clipboard.writeText(url.shortUrl);
-      // Set copied feedback flag state to true
       setCopied(true);
-      // Show success alert toast
       toast.success('Copied to clipboard!');
-      // Reset copied state back to false after 2 seconds to restore copy icon
       setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      // Show error toast on copy failure
+    } catch {
       toast.error('Failed to copy link');
     }
   };
 
-  // Delete handler triggered when pressing trash icon
   const handleDelete = async () => {
-    // Present browser native confirm overlay dialog before deleting URL
-    const confirmDelete = window.confirm('Are you absolutely sure you want to delete this short URL and all associated visit metrics?');
-    
-    // Halt deletion process if user cancels the confirmation
-    if (!confirmDelete) return;
-
-    // Set local deleting loader flag to true
+    if (!window.confirm('Delete this short URL and all its analytics data?')) return;
     setDeleting(true);
-
     try {
-      // Trigger parent callback function passing target URL Mongo ID
       await onDelete(url._id);
     } catch (err) {
-      // Catch exceptions and log them
-      console.error('Delete error inside card component:', err);
+      console.error('Delete error:', err);
     } finally {
-      // Set local deleting loader flag back to false
       setDeleting(false);
     }
   };
 
   return (
-    // Card outer wrapper container with dark backgrounds, custom borders, and hover effects
-    <div className="bg-slate-800 border border-slate-700 hover:border-indigo-500 rounded-xl p-4 shadow-md transition-all duration-300">
-      {/* Upper section containing title headers and click counter badges */}
-      <div className="flex justify-between items-start gap-4 mb-3">
-        {/* URL content title block */}
-        <div className="min-w-0 flex-1">
-          {/* Truncated original URL heading */}
-          <p className="text-xs font-medium text-slate-400 truncate mb-1" title={url.originalUrl}>
-            {url.originalUrl}
-          </p>
-          {/* Output Short Link title */}
-          <a
-            href={url.shortUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-base font-bold text-indigo-400 hover:text-indigo-300 break-all"
-          >
-            {url.shortUrl}
-          </a>
+    <div
+      style={{
+        ...glassCard,
+        padding: '20px',
+        transition: 'all 0.3s ease',
+        borderColor: hovered ? 'rgba(99,102,241,0.4)' : 'rgba(255,255,255,0.08)',
+        boxShadow: hovered ? '0 0 30px rgba(99,102,241,0.2), 0 20px 60px rgba(0,0,0,0.4)' : '0 8px 32px rgba(0,0,0,0.4)',
+        transform: hovered ? 'translateY(-4px)' : 'translateY(0)',
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {/* Original URL */}
+      <p style={{ color: '#64748b', fontSize: '13px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: '6px' }} title={url.originalUrl}>
+        {url.originalUrl}
+      </p>
+
+      {/* Short URL */}
+      <a
+        href={url.shortUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ ...gradientText, fontSize: '16px', fontWeight: 700, display: 'block', marginBottom: '12px', textDecoration: 'none' }}
+      >
+        {url.shortUrl}
+      </a>
+
+      {/* Date + Click badge */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', paddingBottom: '14px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#475569', fontSize: '12px' }}>
+          <Calendar size={12} />
+          <span>{formatDate(url.createdAt)}</span>
+          {url.expiresAt && (
+            <span style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444', borderRadius: '6px', padding: '2px 8px', fontSize: '11px', marginLeft: '6px' }}>
+              Exp: {formatDate(url.expiresAt)}
+            </span>
+          )}
         </div>
-        
-        {/* Click count pill badge */}
-        <div className="flex items-center gap-1 bg-indigo-500/10 border border-indigo-500/20 px-2.5 py-1 rounded-full text-indigo-400 shrink-0">
-          {/* Mouse pointer cursor visual icon */}
-          <MousePointerClick className="h-3.5 w-3.5" />
-          {/* Aggregate clicks count */}
-          <span className="text-xs font-bold">{url.clickCount}</span>
-        </div>
+        {/* Click count badge */}
+        <span style={{ background: 'rgba(99,102,241,0.1)', border: '1px solid rgba(99,102,241,0.25)', color: '#818cf8', borderRadius: '999px', padding: '3px 12px', fontSize: '12px', fontWeight: 700 }}>
+          {url.clickCount} clicks
+        </span>
       </div>
 
-      {/* Timestamp section displaying calendar details */}
-      <div className="flex items-center gap-1.5 text-xs text-slate-400 mb-4 border-b border-slate-700/50 pb-3">
-        {/* Calendar visual icon */}
-        <Calendar className="h-3.5 w-3.5" />
-        {/* Date string */}
-        <span>Created: {formatDate(url.createdAt)}</span>
-        
-        {/* Optional expiration badge indicator */}
-        {url.expiresAt && (
-          // Expiry marker showing date limitations
-          <span className="ml-auto text-[10px] bg-red-500/10 border border-red-500/20 text-red-400 px-2 py-0.5 rounded">
-            Expires: {formatDate(url.expiresAt)}
-          </span>
-        )}
-      </div>
-
-      {/* Button action controls footer row */}
-      <div className="flex justify-between items-center gap-2">
-        {/* Standard operational actions group */}
-        <div className="flex gap-2">
-          {/* Clipboard Copy link button */}
+      {/* Action buttons */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          {/* Copy */}
           <button
             onClick={handleCopy}
-            className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold border ${copied ? 'border-green-500/30 bg-green-500/10 text-green-400' : 'border-slate-700 hover:bg-slate-700 text-slate-300 hover:text-white'}`}
+            style={{
+              ...glassBtn,
+              width: 'auto',
+              padding: '0 12px',
+              gap: '6px',
+              borderColor: copied ? 'rgba(16,185,129,0.3)' : 'rgba(255,255,255,0.1)',
+              background: copied ? 'rgba(16,185,129,0.1)' : 'rgba(255,255,255,0.05)',
+              color: copied ? '#10b981' : '#94a3b8',
+              fontSize: '12px',
+              fontWeight: 600,
+            }}
             title="Copy Short URL"
           >
-            {copied ? (
-              // Success feedback check mark icon
-              <>
-                <Check className="h-3.5 w-3.5" />
-                <span>Copied!</span>
-              </>
-            ) : (
-              // Standard copy clipboard icon
-              <>
-                <Copy className="h-3.5 w-3.5" />
-                <span>Copy</span>
-              </>
-            )}
+            {copied ? <Check size={13} /> : <Copy size={13} />}
+            {copied ? 'Copied!' : 'Copy'}
           </button>
 
-          {/* View QR Code button */}
+          {/* QR */}
           <button
-            // Bind click to callback passing short link
             onClick={() => onShowQR(url.shortUrl)}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-700 hover:bg-slate-700 text-slate-300 hover:text-white"
-            title="Generate QR Code"
+            style={glassBtn}
+            title="QR Code"
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(99,102,241,0.4)'; e.currentTarget.style.color = '#818cf8'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#94a3b8'; }}
           >
-            {/* QR Code visual icon */}
-            <QrCode className="h-3.5 w-3.5" />
-            <span>QR</span>
+            <QrCode size={14} />
           </button>
 
-          {/* Navigate to Analytics detail board button */}
+          {/* Analytics */}
           <button
-            // Route user towards /analytics/shortCode view
             onClick={() => navigate(`/analytics/${url.shortCode}`)}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold border border-slate-700 hover:bg-slate-700 text-slate-300 hover:text-white"
+            style={glassBtn}
             title="View Analytics"
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(99,102,241,0.4)'; e.currentTarget.style.color = '#818cf8'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#94a3b8'; }}
           >
-            {/* Chart graphical icon */}
-            <BarChart3 className="h-3.5 w-3.5" />
-            <span>Stats</span>
+            <BarChart2 size={14} />
           </button>
         </div>
 
-        {/* Delete link action button */}
+        {/* Delete */}
         <button
           onClick={handleDelete}
-          // Disable click action during deletions
           disabled={deleting}
-          className="p-1.5 rounded-lg border border-slate-700 hover:border-red-500/50 text-slate-400 hover:text-red-400 hover:bg-red-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
-          title="Delete Short URL"
+          style={{ ...glassBtn, opacity: deleting ? 0.5 : 1 }}
+          title="Delete"
+          onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(239,68,68,0.4)'; e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#94a3b8'; e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
         >
-          {deleting ? (
-            // Spinner animation during deletions
-            <div className="animate-spin h-4 w-4 border-2 border-red-500 border-t-transparent rounded-full"></div>
-          ) : (
-            // Trash graphical icon
-            <Trash2 className="h-4 w-4" />
-          )}
+          {deleting
+            ? <div style={{ width: '14px', height: '14px', border: '2px solid #ef4444', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+            : <Trash2 size={14} />
+          }
         </button>
       </div>
+
+      <style>{`@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }`}</style>
     </div>
   );
 };
 
-// Export the UrlCard component
 export default UrlCard;

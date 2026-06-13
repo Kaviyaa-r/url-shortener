@@ -1,340 +1,273 @@
-// Import React library and useState hook to manage modal form processes
 import React, { useState } from 'react';
-// Import control icons from the lucide-react graphics library
-import { X, Copy, Check, Loader2, Link as LinkIcon, Sparkles } from 'lucide-react';
-// Import the configured Axios instance to trigger API requests
+import { X, Copy, Check, Loader2, Link as LinkIcon, Sparkles, CheckCircle } from 'lucide-react';
 import axios from '../api/axios';
-// Import toast notification wrapper
 import { toast } from 'react-hot-toast';
 
-// Define the CreateUrlModal overlay component
+const glassCard = {
+  background: 'rgba(255,255,255,0.03)',
+  backdropFilter: 'blur(20px)',
+  WebkitBackdropFilter: 'blur(20px)',
+  border: '1px solid rgba(255,255,255,0.08)',
+  borderTop: '1px solid rgba(255,255,255,0.15)',
+  borderRadius: '16px',
+  boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+  padding: '32px',
+  width: '100%',
+  maxWidth: '480px',
+  position: 'relative',
+};
+
+const glassInput = {
+  background: 'rgba(255,255,255,0.05)',
+  border: '1px solid rgba(255,255,255,0.1)',
+  borderRadius: '10px',
+  color: '#f1f5f9',
+  padding: '12px 16px',
+  outline: 'none',
+  width: '100%',
+  fontSize: '15px',
+  transition: 'all 0.3s ease',
+  boxSizing: 'border-box',
+};
+
+const primaryBtn = {
+  background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+  border: 'none',
+  borderRadius: '10px',
+  color: 'white',
+  fontWeight: 700,
+  padding: '12px 24px',
+  cursor: 'pointer',
+  fontSize: '15px',
+  transition: 'all 0.3s ease',
+  boxShadow: '0 4px 20px rgba(99,102,241,0.4)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '8px',
+};
+
+const glassBtn = {
+  background: 'rgba(255,255,255,0.05)',
+  border: '1px solid rgba(255,255,255,0.1)',
+  borderRadius: '10px',
+  color: '#94a3b8',
+  fontWeight: 600,
+  padding: '12px 24px',
+  cursor: 'pointer',
+  fontSize: '15px',
+  transition: 'all 0.3s ease',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+};
+
 const CreateUrlModal = ({ isOpen, onClose, onSuccess }) => {
-  // Return null immediately if the modal open flag is set to false
   if (!isOpen) return null;
 
-  // Local state to store the long target URL input value
   const [originalUrl, setOriginalUrl] = useState('');
-  // Local state to store the custom alias string input value
   const [customAlias, setCustomAlias] = useState('');
-  // Local state to store the expiry date string input value
   const [expiresAt, setExpiresAt] = useState('');
-  // Local state to track loading indicators during API submissions
   const [loading, setLoading] = useState(false);
-  // Local state to hold API error feedback strings
   const [errorMsg, setErrorMsg] = useState('');
-  // Local state storing the returned short URL object details on success
   const [successData, setSuccessData] = useState(null);
-  // Local state indicating whether the generated short URL has been copied
   const [copied, setCopied] = useState(false);
+  const [focusedField, setFocusedField] = useState(null);
 
-  // Helper validation logic to check if input is a valid URL format
   const validateUrl = (url) => {
     try {
-      // Test URL formatting checks via browser built-in constructor
       new URL(url);
-      // Return true if parsing completes successfully
       return true;
     } catch (_) {
-      // Return false if URL constructor raises parser errors
       return false;
     }
   };
 
-  // Click handler wrapper to dismiss modal when clicking outside the panel
-  const handleBackdropClick = (e) => {
-    // If click target matches the overlay background wrapper container itself
-    if (e.target === e.currentTarget) {
-      // Trigger close callback to dismiss modal
-      onClose();
-    }
-  };
-
-  // Form submit handler to request a new shortened URL
   const handleSubmit = async (e) => {
-    // Prevent default form browser reload on submit
     e.preventDefault();
-    // Clear any previous error messages
     setErrorMsg('');
 
-    // Check if the originalUrl input value is completely empty
     if (!originalUrl.trim()) {
-      // Set validation failure feedback message
       setErrorMsg('Long URL is required');
-      // Halt execution
       return;
     }
-
-    // Verify format of the input URL
     if (!validateUrl(originalUrl.trim())) {
-      // Set format mismatch warning message
       setErrorMsg('Please enter a valid absolute URL (e.g. https://google.com)');
-      // Halt execution
       return;
     }
 
-    // Set loading spinner state to true
     setLoading(true);
 
     try {
-      // Package payload variables
       const payload = {
         originalUrl: originalUrl.trim(),
         customAlias: customAlias.trim() || undefined,
         expiresAt: expiresAt || undefined
       };
 
-      // Dispatch request to create shortened URL
       const response = await axios.post('/urls', payload);
 
-      // If response returns success
       if (response.data.success) {
-        // Set success response state data
         setSuccessData(response.data.data);
-        // Show success banner notification
         toast.success('URL shortened successfully!');
-        // Check if onSuccess callback is defined
-        if (onSuccess) {
-          // Trigger parent component refresh routine
-          onSuccess();
-        }
+        if (onSuccess) onSuccess();
       } else {
-        // Print response errors inside modal
         setErrorMsg(response.data.error || 'Failed to shorten URL');
       }
     } catch (err) {
-      // Read response error message or fallback to server error string
-      const errResponse = err.response?.data?.error || err.response?.data?.message || 'Server error. Please try again.';
-      // Set error message state
-      setErrorMsg(errResponse);
-      // Fire toast notification alert
-      toast.error(errResponse);
+      setErrorMsg(err.response?.data?.error || err.response?.data?.message || 'Server error. Please try again.');
+      toast.error(err.response?.data?.error || 'Failed to shorten URL');
     } finally {
-      // Deactivate submit loader
       setLoading(false);
     }
   };
 
-  // Copy-to-clipboard handler for the generated short URL
   const handleCopy = async () => {
-    // Check if successData exists containing the link
     if (successData?.shortUrl) {
       try {
-        // Write the short URL string to the system clipboard
         await navigator.clipboard.writeText(successData.shortUrl);
-        // Set copied flag state to true
         setCopied(true);
-        // Show success alert toast
-        toast.success('Short link copied to clipboard!');
-        // Set a timeout to reset copied feedback icons after 2 seconds
+        toast.success('Short link copied!');
         setTimeout(() => setCopied(false), 2000);
-      } catch (err) {
-        // Show error toast on failure
-        toast.error('Failed to copy link');
+      } catch {
+        toast.error('Failed to copy');
       }
     }
   };
 
-  // Reset form states to create another shortened URL
   const handleReset = () => {
-    // Clear long URL input
-    setOriginalUrl('');
-    // Clear custom alias input
-    setCustomAlias('');
-    // Clear expiration date input
-    setExpiresAt('');
-    // Reset success database state to null
-    setSuccessData(null);
-    // Reset clipboard copy flag to false
-    setCopied(false);
-    // Clear validation error strings
-    setErrorMsg('');
+    setOriginalUrl(''); setCustomAlias(''); setExpiresAt('');
+    setSuccessData(null); setCopied(false); setErrorMsg('');
   };
 
+  const inputStyle = (field) => ({
+    ...glassInput,
+    borderColor: focusedField === field ? '#6366f1' : 'rgba(255,255,255,0.1)',
+    boxShadow: focusedField === field ? '0 0 0 3px rgba(99,102,241,0.2)' : 'none',
+  });
+
   return (
-    // Backdrop overlay container styled with dark opacity background filters
     <div
-      onClick={handleBackdropClick}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn"
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 1000,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: 'rgba(0,0,0,0.75)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        padding: '20px',
+        animation: 'fadeIn 0.2s ease',
+      }}
     >
-      {/* Modal dialog box card */}
-      <div className="relative w-full max-w-lg bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-2xl overflow-hidden">
-        
-        {/* Absolute top right close trigger */}
+      <div style={glassCard}>
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700"
+          style={{ position: 'absolute', top: '24px', right: '24px', background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '4px', borderRadius: '8px', transition: 'all 0.2s ease' }}
+          onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+          onMouseLeave={e => e.currentTarget.style.background = 'none'}
         >
-          {/* Close graphic icon */}
-          <X className="h-5 w-5" />
+          <X size={20} />
         </button>
 
-        {/* Render Form interface if creation is not completed yet */}
         {!successData ? (
           <div>
-            {/* Header section containing labels */}
-            <div className="flex items-center gap-2 mb-6">
-              {/* Graphic icon wrapper */}
-              <div className="p-2 bg-indigo-500/10 rounded-lg">
-                {/* Logo icon */}
-                <LinkIcon className="h-5 w-5 text-indigo-400" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '32px' }}>
+              <div style={{ background: 'rgba(99,102,241,0.15)', padding: '10px', borderRadius: '12px' }}>
+                <LinkIcon size={20} color="#818cf8" />
               </div>
-              {/* Title label */}
-              <h3 className="text-xl font-bold text-white">Shorten a URL</h3>
+              <h3 style={{ fontSize: '22px', fontWeight: 800, color: '#f1f5f9', margin: 0 }}>Shorten a URL</h3>
             </div>
 
-            {/* Modal submit form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Target long URL input parameter container */}
-              <div>
-                {/* Input label */}
-                <label className="block text-sm font-medium text-slate-300 mb-1" htmlFor="modal-long-url">
-                  Long URL <span className="text-red-500">*</span>
+            <form onSubmit={handleSubmit}>
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', color: '#94a3b8', fontSize: '13px', fontWeight: 600, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  Long URL <span style={{ color: '#ef4444' }}>*</span>
                 </label>
-                {/* Long URL text input component */}
-                <input
-                  id="modal-long-url"
-                  type="text"
-                  value={originalUrl}
-                  // Set value change handler to update state on input
-                  onChange={(e) => setOriginalUrl(e.target.value)}
-                  className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                  placeholder="https://example.com/very/long/path/to/resource"
-                />
+                <input type="text" value={originalUrl} onChange={e => setOriginalUrl(e.target.value)}
+                  onFocus={() => setFocusedField('url')} onBlur={() => setFocusedField(null)}
+                  style={inputStyle('url')} placeholder="https://example.com/very/long/path" />
               </div>
 
-              {/* Custom Alias input parameter container */}
-              <div>
-                {/* Input label */}
-                <label className="block text-sm font-medium text-slate-300 mb-1" htmlFor="modal-alias">
-                  Custom Alias <span className="text-xs text-slate-500">(Optional)</span>
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', color: '#94a3b8', fontSize: '13px', fontWeight: 600, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  Custom Alias <span style={{ color: '#64748b', textTransform: 'none', fontWeight: 400 }}>(Optional)</span>
                 </label>
-                {/* Custom alias text input component */}
-                <input
-                  id="modal-alias"
-                  type="text"
-                  value={customAlias}
-                  // Set value change handler to update state on input
-                  onChange={(e) => setCustomAlias(e.target.value)}
-                  className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                  placeholder="my-brand"
-                />
+                <input type="text" value={customAlias} onChange={e => setCustomAlias(e.target.value)}
+                  onFocus={() => setFocusedField('alias')} onBlur={() => setFocusedField(null)}
+                  style={inputStyle('alias')} placeholder="my-brand" />
               </div>
 
-              {/* Expiration Date input parameter container */}
-              <div>
-                {/* Input label */}
-                <label className="block text-sm font-medium text-slate-300 mb-1" htmlFor="modal-expiry">
-                  Expiry Date <span className="text-xs text-slate-500">(Optional)</span>
+              <div style={{ marginBottom: '24px' }}>
+                <label style={{ display: 'block', color: '#94a3b8', fontSize: '13px', fontWeight: 600, marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  Expiry Date <span style={{ color: '#64748b', textTransform: 'none', fontWeight: 400 }}>(Optional)</span>
                 </label>
-                {/* Date input component */}
-                <input
-                  id="modal-expiry"
-                  type="date"
-                  value={expiresAt}
-                  // Set value change handler to update state on input
-                  onChange={(e) => setExpiresAt(e.target.value)}
-                  className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                />
+                <input type="date" value={expiresAt} onChange={e => setExpiresAt(e.target.value)}
+                  onFocus={() => setFocusedField('date')} onBlur={() => setFocusedField(null)}
+                  style={inputStyle('date')} />
               </div>
 
-              {/* Tally error display box */}
               {errorMsg && (
-                <p className="text-sm text-red-500 font-medium">{errorMsg}</p>
+                <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444', padding: '12px', borderRadius: '10px', fontSize: '13px', marginBottom: '24px', fontWeight: 500 }}>
+                  {errorMsg}
+                </div>
               )}
 
-              {/* Submit and close buttons row */}
-              <div className="flex gap-3 justify-end mt-6">
-                {/* Cancel button */}
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="px-4 py-2 border border-slate-700 hover:bg-slate-700 rounded-lg text-sm font-semibold text-slate-300 hover:text-white"
-                >
-                  Cancel
-                </button>
-                {/* Shorten submission trigger button */}
-                <button
-                  type="submit"
-                  // Disable interaction during loading
-                  disabled={loading}
-                  className="flex items-center justify-center gap-1.5 px-5 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-sm font-semibold text-white"
-                >
-                  {loading ? (
-                    // Loader animation
-                    <Loader2 className="animate-spin h-4 w-4" />
-                  ) : (
-                    // Standard action layout
-                    <>
-                      {/* Graphics icon decoration */}
-                      <Sparkles className="h-4 w-4" />
-                      <span>Shorten Link</span>
-                    </>
-                  )}
-                </button>
-              </div>
+              <button type="submit" disabled={loading} style={{ ...primaryBtn, width: '100%', opacity: loading ? 0.7 : 1 }}>
+                {loading ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : <><Sparkles size={18} /> Shorten Link</>}
+              </button>
             </form>
           </div>
         ) : (
-          // Render Success Screen after short URL is returned
-          <div className="text-center py-4">
-            {/* Header decoration containing check icons */}
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-500/10 mb-4">
-              {/* Check mark graphics */}
-              <Check className="h-6 w-6 text-green-500" />
+          <div style={{ textAlign: 'center', padding: '10px 0' }}>
+            <div style={{ background: 'rgba(16,185,129,0.1)', borderRadius: '50%', width: '64px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', border: '1px solid rgba(16,185,129,0.2)' }}>
+              <CheckCircle size={32} color="#10b981" />
             </div>
-            {/* Action complete title */}
-            <h3 className="text-xl font-bold text-white mb-2">Short Link Generated!</h3>
-            {/* Brief tag */}
-            <p className="text-sm text-slate-400 mb-6">Your premium short URL is ready to share.</p>
+            <h3 style={{ fontSize: '24px', fontWeight: 800, color: '#f1f5f9', marginBottom: '8px' }}>Link Created!</h3>
+            <p style={{ color: '#94a3b8', fontSize: '15px', marginBottom: '24px' }}>Your premium short URL is ready to share.</p>
 
-            {/* Link display container */}
-            <div className="flex items-center gap-2 p-3 bg-slate-900 border border-slate-700 rounded-lg mb-6">
-              {/* Readonly output link field */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '8px 8px 8px 16px', marginBottom: '32px' }}>
               <input
-                type="text"
-                readOnly
-                value={successData.shortUrl}
-                className="w-full bg-transparent border-none text-indigo-400 font-semibold text-sm focus:outline-none focus:ring-0"
+                type="text" readOnly value={successData.shortUrl}
+                style={{ flex: 1, background: 'transparent', border: 'none', color: '#818cf8', fontWeight: 700, fontSize: '15px', outline: 'none' }}
               />
-              {/* Copy URL clipboard action button */}
               <button
                 onClick={handleCopy}
-                className={`p-2 rounded-lg border ${copied ? 'border-green-500/30 bg-green-500/10 text-green-400' : 'border-slate-700 hover:bg-slate-700 text-slate-400 hover:text-white'}`}
+                style={{
+                  background: copied ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.1)',
+                  border: '1px solid',
+                  borderColor: copied ? 'rgba(16,185,129,0.3)' : 'rgba(255,255,255,0.1)',
+                  borderRadius: '8px',
+                  color: copied ? '#10b981' : '#f1f5f9',
+                  padding: '8px 12px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  transition: 'all 0.2s ease',
+                }}
               >
-                {copied ? (
-                  // Checked checkmark feedback icon
-                  <Check className="h-4 w-4" />
-                ) : (
-                  // Uncopied copy icon
-                  <Copy className="h-4 w-4" />
-                )}
+                {copied ? <Check size={14} /> : <Copy size={14} />}
+                {copied ? 'Copied' : 'Copy'}
               </button>
             </div>
 
-            {/* Success screen action buttons footer */}
-            <div className="flex gap-3 justify-center">
-              {/* Shorten another link button */}
-              <button
-                onClick={handleReset}
-                className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm font-semibold text-white"
-              >
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button onClick={handleReset} style={{ ...glassBtn, flex: 1 }} onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'} onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}>
                 Shorten Another
               </button>
-              {/* Close modal wrapper button */}
-              <button
-                onClick={onClose}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-sm font-semibold text-white"
-              >
+              <button onClick={onClose} style={{ ...primaryBtn, flex: 1 }}>
                 Done
               </button>
             </div>
           </div>
         )}
-
       </div>
+
+      <style>{`@keyframes fadeIn { from{opacity:0} to{opacity:1} } @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }`}</style>
     </div>
   );
 };
 
-// Export the CreateUrlModal overlay component
 export default CreateUrlModal;

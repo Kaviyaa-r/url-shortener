@@ -1,392 +1,289 @@
-// Import React library and useState/useEffect hooks to handle state events
 import React, { useState, useEffect } from 'react';
-// Import useParams and useNavigate routing hooks from react-router-dom
 import { useParams, useNavigate } from 'react-router-dom';
-// Import Axios client instance to coordinate API calls
 import axios from '../api/axios';
-// Import header navigation panel component
 import Navbar from '../components/Navbar';
-// Import Recharts bar graph wrapper component
 import ClickChart from '../components/ClickChart';
-// Import graphic and navigation icons from lucide-react library
-import { ArrowLeft, MousePointerClick, Calendar, Link as LinkIcon, Globe, Laptop, AlertCircle, BarChart } from 'lucide-react';
-// Import toast notification client
+import { ArrowLeft, AlertCircle, Globe, Laptop, BarChart } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
-// Define the Analytics component which presents URL statistics
+const bg = {
+  background: 'linear-gradient(135deg, #060818 0%, #0d0b2e 50%, #060818 100%)',
+  minHeight: '100vh',
+  position: 'relative',
+  overflow: 'hidden',
+};
+
+const orb = { position: 'absolute', pointerEvents: 'none', borderRadius: '50%', zIndex: 0 };
+
+const glassCard = {
+  background: 'rgba(255,255,255,0.03)',
+  backdropFilter: 'blur(20px)',
+  WebkitBackdropFilter: 'blur(20px)',
+  border: '1px solid rgba(255,255,255,0.08)',
+  borderTop: '1px solid rgba(255,255,255,0.15)',
+  borderRadius: '16px',
+  boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+};
+
+const gradientText = {
+  background: 'linear-gradient(90deg, #818cf8, #c084fc, #f472b6)',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  backgroundClip: 'text',
+};
+
+const glassBtn = {
+  background: 'rgba(255,255,255,0.05)',
+  border: '1px solid rgba(255,255,255,0.1)',
+  borderRadius: '10px',
+  color: '#94a3b8',
+  fontWeight: 600,
+  padding: '8px 16px',
+  cursor: 'pointer',
+  fontSize: '14px',
+  transition: 'all 0.3s ease',
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '8px',
+  textDecoration: 'none',
+};
+
 const Analytics = () => {
-  // Extract the shortCode route parameter using useParams
   const { shortCode } = useParams();
-  // Instantiate navigation redirect helper
   const navigate = useNavigate();
-  // Local state to store analytics data returned from API
   const [analytics, setAnalytics] = useState(null);
-  // Local state to track loading indicators
   const [loading, setLoading] = useState(true);
-  // Local state to capture API query failure messages
   const [error, setError] = useState(null);
 
-  // Define data fetch routine to fetch analytics from backend
-  const fetchAnalytics = async () => {
-    // Set loading indicator state to true
-    setLoading(true);
-    // Clear any previous error states
-    setError(null);
-
-    try {
-      // Dispatch GET request targeting the specific shortCode analytics prefix
-      const response = await axios.get(`/analytics/${shortCode}`);
-      // If retrieval completes successfully
-      if (response.data.success) {
-        // Save retrieved payload to state
-        setAnalytics(response.data.data);
-      } else {
-        // Set query error message state
-        setError(response.data.error || 'Failed to fetch analytics');
-      }
-    } catch (err) {
-      // Read response error message or fallback to default string
-      const errMsg = err.response?.data?.error || 'Short URL analytics not found.';
-      // Set error message state
-      setError(errMsg);
-      // Fire toast notification alert
-      toast.error(errMsg);
-    } finally {
-      // Deactivate loader skeletons
-      setLoading(false);
-    }
-  };
-
-  // Run data fetch routine on mount or when shortCode parameter shifts
   useEffect(() => {
+    const fetchAnalytics = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await axios.get(`/analytics/${shortCode}`);
+        if (response.data.success) {
+          setAnalytics(response.data.data);
+        } else {
+          setError(response.data.error || 'Failed to fetch analytics');
+        }
+      } catch (err) {
+        const errMsg = err.response?.data?.error || 'Short URL analytics not found.';
+        setError(errMsg);
+        toast.error(errMsg);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchAnalytics();
   }, [shortCode]);
 
-  // Date formatter helper to output formatted timestamp text
   const formatDate = (dateString) => {
-    // Return placeholder if date string is missing
     if (!dateString) return 'Never';
-    // Instantiate date constructor from ISO string
     const date = new Date(dateString);
-    // Return formatted date and time string
     return date.toLocaleString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+      month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit',
     });
   };
 
-  // Render a clean loading skeleton dashboard matching dark layouts
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 text-white pb-12">
+      <div style={bg}>
         <Navbar />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-          <div className="animate-pulse space-y-6">
-            <div className="h-8 bg-slate-800 rounded w-1/4"></div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-              <div className="h-24 bg-slate-800 rounded-xl"></div>
-              <div className="h-24 bg-slate-800 rounded-xl"></div>
-              <div className="h-24 bg-slate-800 rounded-xl"></div>
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: '1200px', margin: '0 auto', padding: '32px 24px 60px' }}>
+          <div style={{ animation: 'pulse 2s infinite' }}>
+            <div style={{ height: '32px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', width: '25%', marginBottom: '24px' }} />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '32px' }}>
+              {[1,2,3,4].map(i => <div key={i} style={{ height: '100px', background: 'rgba(255,255,255,0.05)', borderRadius: '16px' }} />)}
             </div>
-            <div className="h-64 bg-slate-800 rounded-xl"></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div className="h-48 bg-slate-800 rounded-xl"></div>
-              <div className="h-48 bg-slate-800 rounded-xl"></div>
+            <div style={{ height: '320px', background: 'rgba(255,255,255,0.05)', borderRadius: '16px', marginBottom: '32px' }} />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+              {[1,2].map(i => <div key={i} style={{ height: '240px', background: 'rgba(255,255,255,0.05)', borderRadius: '16px' }} />)}
             </div>
           </div>
         </div>
+        <style>{`@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }`}</style>
       </div>
     );
   }
 
-  // Render an error message block if retrieval attempts fail
   if (error || !analytics) {
     return (
-      <div className="min-h-screen bg-slate-900 text-white flex flex-col">
+      <div style={bg}>
         <Navbar />
-        <div className="flex-1 flex flex-col items-center justify-center p-4 text-center">
-          <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-full mb-4 text-red-400">
-            <AlertCircle className="h-8 w-8" />
+        <div style={{ position: 'relative', zIndex: 1, flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 20px', textAlign: 'center' }}>
+          <div style={{ background: 'rgba(239,68,68,0.1)', padding: '20px', borderRadius: '50%', marginBottom: '20px', border: '1px solid rgba(239,68,68,0.2)' }}>
+            <AlertCircle size={40} color="#ef4444" />
           </div>
-          <h2 className="text-xl font-bold text-white mb-2">Failed to load analytics</h2>
-          <p className="text-sm text-slate-400 max-w-sm mb-6">{error || 'Something went wrong.'}</p>
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="flex items-center gap-1.5 px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm font-semibold text-white transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span>Back to Dashboard</span>
+          <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#f1f5f9', marginBottom: '12px' }}>Failed to load analytics</h2>
+          <p style={{ color: '#94a3b8', fontSize: '15px', marginBottom: '32px', maxWidth: '400px' }}>{error || 'Something went wrong.'}</p>
+          <button onClick={() => navigate('/dashboard')} style={glassBtn} onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'} onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}>
+            <ArrowLeft size={16} /> Back to Dashboard
           </button>
         </div>
       </div>
     );
   }
 
-  // Calculate browser stats sum to represent scale percentages
   const browserKeys = Object.keys(analytics.browserStats || {});
   const totalBrowserClicks = browserKeys.reduce((sum, key) => sum + analytics.browserStats[key], 0);
 
-  // Extract device count parameters
   const desktopClicks = analytics.deviceStats?.Desktop || 0;
   const mobileClicks = analytics.deviceStats?.Mobile || 0;
   const tabletClicks = analytics.deviceStats?.Tablet || 0;
   const totalDeviceClicks = desktopClicks + mobileClicks + tabletClicks;
 
   return (
-    // Outer content layout styled with dark background slate shades
-    <div className="min-h-screen bg-slate-900 text-white pb-12">
-      {/* Render Navbar header panel */}
-      <Navbar />
+    <div style={bg}>
+      <div className="orb-1" style={{ ...orb, top: '-100px', left: '-100px', width: '500px', height: '500px', background: 'radial-gradient(ellipse, rgba(99,102,241,0.15), transparent 70%)' }} />
+      <div className="orb-2" style={{ ...orb, top: '50%', right: '-150px', width: '400px', height: '400px', background: 'radial-gradient(ellipse, rgba(139,92,246,0.1), transparent 70%)' }} />
+      <div className="orb-3" style={{ ...orb, bottom: '-100px', left: '30%', width: '350px', height: '350px', background: 'radial-gradient(ellipse, rgba(236,72,153,0.08), transparent 70%)' }} />
 
-      {/* Main analytics board content panel */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-        
-        {/* Back navigation button trigger */}
-        <button
-          onClick={() => navigate('/dashboard')}
-          className="flex items-center gap-1.5 text-xs font-semibold text-indigo-400 hover:text-indigo-300 mb-6 group"
-        >
-          {/* Arrow visual icon transitioning left on hover */}
-          <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-          <span>Back to Dashboard</span>
-        </button>
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <Navbar />
 
-        {/* Dashboard Title section displaying active shortcode */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-extrabold text-white">Analytics</h1>
-          <p className="mt-1 text-sm text-slate-400">
-            Detailed click traffic metrics for shortcode:{' '}
-            <span className="text-indigo-400 font-bold tracking-wider">{analytics.shortCode}</span>
-          </p>
-        </div>
+        <main style={{ maxWidth: '1200px', margin: '0 auto', padding: '32px 24px 60px' }}>
+          
+          <button onClick={() => navigate('/dashboard')} style={{ ...glassBtn, marginBottom: '24px' }} onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#f1f5f9'; }} onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = '#94a3b8'; }}>
+            <ArrowLeft size={16} /> Dashboard
+          </button>
 
-        {/* Metrics overview row cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-5 mb-8">
-          {/* Box: Clicks tally */}
-          <div className="bg-slate-800 border border-slate-700/60 rounded-xl p-5">
-            <div className="flex justify-between items-start text-indigo-400 mb-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Total Clicks</span>
-              <MousePointerClick className="h-5 w-5" />
-            </div>
-            <p className="text-3xl font-extrabold text-indigo-400">{analytics.totalClicks}</p>
-          </div>
-
-          {/* Box: Last redirection visit date */}
-          <div className="bg-slate-800 border border-slate-700/60 rounded-xl p-5">
-            <div className="flex justify-between items-start text-green-400 mb-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Last Visited</span>
-              <Calendar className="h-5 w-5" />
-            </div>
-            <p className="text-sm font-semibold text-white mt-2 truncate">
-              {formatDate(analytics.lastVisited)}
+          <div style={{ marginBottom: '32px' }}>
+            <h1 style={{ fontSize: '32px', fontWeight: 800, color: '#f1f5f9', marginBottom: '8px' }}>Analytics</h1>
+            <p style={{ color: '#94a3b8', fontSize: '15px' }}>
+              Metrics for <span style={{ ...gradientText, fontWeight: 700, fontSize: '16px' }}>{analytics.shortCode}</span>
             </p>
           </div>
 
-          {/* Box: Creation date */}
-          <div className="bg-slate-800 border border-slate-700/60 rounded-xl p-5">
-            <div className="flex justify-between items-start text-yellow-400 mb-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Created Date</span>
-              <Calendar className="h-5 w-5" />
+          {/* Stats Grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px', marginBottom: '32px' }}>
+            <div style={{ ...glassCard, padding: '24px' }}>
+              <p style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>Total Clicks</p>
+              <p style={{ color: '#818cf8', fontSize: '36px', fontWeight: 900, lineHeight: 1 }}>{analytics.totalClicks}</p>
             </div>
-            <p className="text-sm font-semibold text-white mt-2 truncate">
-              {formatDate(analytics.createdAt)}
-            </p>
+            <div style={{ ...glassCard, padding: '24px' }}>
+              <p style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>Last Visited</p>
+              <p style={{ color: '#f1f5f9', fontSize: '15px', fontWeight: 600 }}>{formatDate(analytics.lastVisited)}</p>
+            </div>
+            <div style={{ ...glassCard, padding: '24px' }}>
+              <p style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>Created</p>
+              <p style={{ color: '#f1f5f9', fontSize: '15px', fontWeight: 600 }}>{formatDate(analytics.createdAt)}</p>
+            </div>
+            <div style={{ ...glassCard, padding: '24px' }}>
+              <p style={{ color: '#94a3b8', fontSize: '13px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>Original URL</p>
+              <a href={analytics.originalUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#818cf8', fontSize: '14px', fontWeight: 600, textDecoration: 'none', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} onMouseEnter={e => e.currentTarget.style.textDecoration = 'underline'} onMouseLeave={e => e.currentTarget.style.textDecoration = 'none'}>
+                {analytics.originalUrl}
+              </a>
+            </div>
           </div>
 
-          {/* Box: Link target URL */}
-          <div className="bg-slate-800 border border-slate-700/60 rounded-xl p-5">
-            <div className="flex justify-between items-start text-slate-400 mb-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Original URL</span>
-              <LinkIcon className="h-5 w-5" />
-            </div>
-            {/* Clickable link to original target */}
-            <a
-              href={analytics.originalUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block text-sm font-semibold text-indigo-400 hover:underline mt-2 truncate"
-              title={analytics.originalUrl}
-            >
-              {analytics.originalUrl}
-            </a>
+          <div style={{ marginBottom: '32px' }}>
+            <ClickChart data={analytics.dailyClicks} />
           </div>
-        </div>
 
-        {/* Graph Layout component */}
-        <div className="mb-8">
-          <ClickChart data={analytics.dailyClicks} />
-        </div>
-
-        {/* Demographic statistics row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          {/* Browser analytics card */}
-          <div className="bg-slate-800 border border-slate-700/60 rounded-xl p-6 shadow-lg">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="p-2 bg-indigo-500/10 rounded-lg text-indigo-400">
-                <Globe className="h-5 w-5" />
-              </div>
-              <h3 className="text-base font-bold text-white">Browser Stats</h3>
-            </div>
+          {/* Browser and Device Stats */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px', marginBottom: '32px' }}>
             
-            {/* Browser list wrapper */}
-            {browserKeys.length > 0 ? (
-              <div className="space-y-4">
-                {browserKeys.map(key => {
-                  // Calculate count value
-                  const count = analytics.browserStats[key];
-                  // Calculate progress percentage
-                  const percentage = totalBrowserClicks > 0 ? Math.round((count / totalBrowserClicks) * 100) : 0;
-                  
-                  return (
-                    <div key={key}>
-                      {/* Name and stats indicators */}
-                      <div className="flex justify-between items-center text-xs mb-1.5">
-                        <span className="font-semibold text-slate-300">{key}</span>
-                        <span className="font-bold text-indigo-400">{count} clicks ({percentage}%)</span>
-                      </div>
-                      {/* Progress bar container */}
-                      <div className="h-2 w-full bg-slate-900 rounded-full overflow-hidden">
-                        {/* Dynamic progress bar representing browser share */}
-                        <div
-                          className="h-full bg-indigo-500 rounded-full"
-                          style={{ width: `${percentage}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                  );
-                })}
+            {/* Browser */}
+            <div style={{ ...glassCard, padding: '24px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px' }}>
+                <div style={{ background: 'rgba(99,102,241,0.15)', padding: '8px', borderRadius: '10px' }}><Globe size={18} color="#818cf8" /></div>
+                <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#f1f5f9', margin: 0 }}>Browser Stats</h3>
               </div>
-            ) : (
-              // Empty warning message if no browser data exists
-              <p className="text-sm text-slate-400 text-center py-6">No browser logs recorded yet.</p>
-            )}
-          </div>
-
-          {/* Device analytics card */}
-          <div className="bg-slate-800 border border-slate-700/60 rounded-xl p-6 shadow-lg">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="p-2 bg-indigo-500/10 rounded-lg text-indigo-400">
-                <Laptop className="h-5 w-5" />
-              </div>
-              <h3 className="text-base font-bold text-white">Device Breakdown</h3>
+              {browserKeys.length > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {browserKeys.map(key => {
+                    const count = analytics.browserStats[key];
+                    const percentage = totalBrowserClicks > 0 ? Math.round((count / totalBrowserClicks) * 100) : 0;
+                    return (
+                      <div key={key}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                          <span style={{ color: '#cbd5e1', fontSize: '13px', fontWeight: 600 }}>{key}</span>
+                          <span style={{ color: '#818cf8', fontSize: '13px', fontWeight: 700 }}>{count} ({percentage}%)</span>
+                        </div>
+                        <div style={{ height: '6px', background: 'rgba(255,255,255,0.06)', borderRadius: '99px', overflow: 'hidden' }}>
+                          <div style={{ height: '100%', background: '#6366f1', width: `${percentage}%`, borderRadius: '99px' }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p style={{ color: '#64748b', fontSize: '14px', textAlign: 'center', margin: '32px 0' }}>No browser data yet.</p>
+              )}
             </div>
 
-            {/* Render device stats if data exists */}
-            {totalDeviceClicks > 0 ? (
-              <div className="space-y-4">
-                {/* Desktop Stat display block */}
-                <div>
-                  <div className="flex justify-between items-center text-xs mb-1.5">
-                    <span className="font-semibold text-slate-300">Desktop</span>
-                    <span className="font-bold text-white">{desktopClicks} clicks</span>
-                  </div>
-                  <div className="h-2 w-full bg-slate-900 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-indigo-500 rounded-full"
-                      style={{ width: `${totalDeviceClicks > 0 ? (desktopClicks / totalDeviceClicks) * 100 : 0}%` }}
-                    ></div>
-                  </div>
-                </div>
-
-                {/* Mobile Stat display block */}
-                <div>
-                  <div className="flex justify-between items-center text-xs mb-1.5">
-                    <span className="font-semibold text-slate-300">Mobile</span>
-                    <span className="font-bold text-white">{mobileClicks} clicks</span>
-                  </div>
-                  <div className="h-2 w-full bg-slate-900 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-green-500 rounded-full"
-                      style={{ width: `${totalDeviceClicks > 0 ? (mobileClicks / totalDeviceClicks) * 100 : 0}%` }}
-                    ></div>
-                  </div>
-                </div>
-
-                {/* Tablet Stat display block */}
-                <div>
-                  <div className="flex justify-between items-center text-xs mb-1.5">
-                    <span className="font-semibold text-slate-300">Tablet</span>
-                    <span className="font-bold text-white">{tabletClicks} clicks</span>
-                  </div>
-                  <div className="h-2 w-full bg-slate-900 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-yellow-500 rounded-full"
-                      style={{ width: `${totalDeviceClicks > 0 ? (tabletClicks / totalDeviceClicks) * 100 : 0}%` }}
-                    ></div>
-                  </div>
-                </div>
+            {/* Device */}
+            <div style={{ ...glassCard, padding: '24px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px' }}>
+                <div style={{ background: 'rgba(99,102,241,0.15)', padding: '8px', borderRadius: '10px' }}><Laptop size={18} color="#818cf8" /></div>
+                <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#f1f5f9', margin: 0 }}>Device Breakdown</h3>
               </div>
-            ) : (
-              // Empty warning message if no device data exists
-              <p className="text-sm text-slate-400 text-center py-6">No device logs recorded yet.</p>
-            )}
-          </div>
-        </div>
-
-        {/* Recent visits data table section */}
-        <div className="bg-slate-800 border border-slate-700/60 rounded-xl p-6 shadow-lg overflow-hidden">
-          {/* Header layout */}
-          <div className="flex items-center gap-2 mb-6">
-            <div className="p-2 bg-indigo-500/10 rounded-lg text-indigo-400">
-              <BarChart className="h-5 w-5" />
+              {totalDeviceClicks > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {[
+                    { label: 'Desktop', count: desktopClicks },
+                    { label: 'Mobile', count: mobileClicks },
+                    { label: 'Tablet', count: tabletClicks }
+                  ].map(dev => {
+                    const percentage = totalDeviceClicks > 0 ? Math.round((dev.count / totalDeviceClicks) * 100) : 0;
+                    return (
+                      <div key={dev.label}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                          <span style={{ color: '#cbd5e1', fontSize: '13px', fontWeight: 600 }}>{dev.label}</span>
+                          <span style={{ color: '#818cf8', fontSize: '13px', fontWeight: 700 }}>{dev.count} ({percentage}%)</span>
+                        </div>
+                        <div style={{ height: '6px', background: 'rgba(255,255,255,0.06)', borderRadius: '99px', overflow: 'hidden' }}>
+                          <div style={{ height: '100%', background: '#6366f1', width: `${percentage}%`, borderRadius: '99px' }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p style={{ color: '#64748b', fontSize: '14px', textAlign: 'center', margin: '32px 0' }}>No device data yet.</p>
+              )}
             </div>
-            <h3 className="text-base font-bold text-white">Recent Visits (Last 20)</h3>
           </div>
 
-          {/* Table container wrapping element for mobile scrollbars */}
-          <div className="overflow-x-auto">
-            {analytics.recentVisits && analytics.recentVisits.length > 0 ? (
-              <table className="min-w-full divide-y divide-slate-700">
-                {/* Table Header indicators */}
-                <thead className="bg-slate-900/60">
-                  <tr>
-                    <th scope="col" className="px-6 py-3.5 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Time</th>
-                    <th scope="col" className="px-6 py-3.5 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Browser</th>
-                    <th scope="col" className="px-6 py-3.5 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Device</th>
-                    <th scope="col" className="px-6 py-3.5 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Referrer</th>
-                  </tr>
-                </thead>
-                
-                {/* Table Body rows */}
-                <tbody className="divide-y divide-slate-700/50 bg-slate-800">
-                  {/* Map over visits list up to 20 */}
-                  {analytics.recentVisits.map((visit, index) => (
-                    // Striped dark backgrounds logic
-                    <tr key={visit._id} className={index % 2 === 0 ? 'bg-slate-800/40' : 'bg-slate-800/80'}>
-                      {/* Visit timestamp */}
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
-                        {formatDate(visit.visitedAt)}
-                      </td>
-                      {/* Visit browser profile */}
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
-                        {visit.browser}
-                      </td>
-                      {/* Visit device profile */}
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
-                        {visit.device}
-                      </td>
-                      {/* Visit referrer origin URL */}
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400 truncate max-w-xs" title={visit.referer}>
-                        {visit.referer}
-                      </td>
+          {/* Recent Visits Table */}
+          <div style={{ ...glassCard, padding: '24px', overflow: 'hidden' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px' }}>
+              <div style={{ background: 'rgba(99,102,241,0.15)', padding: '8px', borderRadius: '10px' }}><BarChart size={18} color="#818cf8" /></div>
+              <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#f1f5f9', margin: 0 }}>Recent Visits (Last 20)</h3>
+            </div>
+
+            <div style={{ overflowX: 'auto' }}>
+              {analytics.recentVisits && analytics.recentVisits.length > 0 ? (
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                      <th style={{ padding: '12px 16px', color: '#94a3b8', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Time</th>
+                      <th style={{ padding: '12px 16px', color: '#94a3b8', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Browser</th>
+                      <th style={{ padding: '12px 16px', color: '#94a3b8', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Device</th>
+                      <th style={{ padding: '12px 16px', color: '#94a3b8', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Referrer</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              // Empty warning message if no logs have been recorded
-              <p className="text-sm text-slate-400 text-center py-12">No redirects logged for this URL yet.</p>
-            )}
+                  </thead>
+                  <tbody>
+                    {analytics.recentVisits.map((visit, idx) => (
+                      <tr key={visit._id} style={{ background: idx % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                        <td style={{ padding: '14px 16px', color: '#e2e8f0', fontSize: '14px', whiteSpace: 'nowrap' }}>{formatDate(visit.visitedAt)}</td>
+                        <td style={{ padding: '14px 16px', color: '#f8fafc', fontSize: '14px', fontWeight: 500, whiteSpace: 'nowrap' }}>{visit.browser}</td>
+                        <td style={{ padding: '14px 16px', color: '#e2e8f0', fontSize: '14px', whiteSpace: 'nowrap' }}>{visit.device}</td>
+                        <td style={{ padding: '14px 16px', color: '#94a3b8', fontSize: '14px', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={visit.referer}>{visit.referer}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <p style={{ color: '#64748b', fontSize: '14px', textAlign: 'center', margin: '40px 0' }}>No redirects logged for this URL yet.</p>
+              )}
+            </div>
           </div>
-        </div>
 
-      </main>
+        </main>
+      </div>
     </div>
   );
 };
 
-// Export the Analytics page component
 export default Analytics;

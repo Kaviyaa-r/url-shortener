@@ -1,7 +1,7 @@
 
 🔗 SnapLink — URL Shortener with Analytics
 
-A full-stack URL shortener platform with real-time analytics, QR code generation, and a beautiful dark dashboard.
+A full-stack URL shortener platform with real-time analytics, QR code generation, and a stunning glassmorphism UI featuring interactive floating orbs and responsive layouts.
 🎥 Demo Video
 📹 Watch the full demo on Loom/YouTube ← ( )
 
@@ -20,6 +20,7 @@ Bonus Features
 🏷️ Custom Aliases — Choose your own short code (e.g. /my-brand)
 📈 Click Trend Charts — Daily click bar chart per URL (last 7 days)
 🌐 Device & Browser Tracking — See what devices/browsers visitors use
+🎨 Glassmorphism UI — Modern dark aesthetic with frosted glass components, dynamic hover effects, and animated background orbs
 
 
 <img width="827" height="582" alt="image" src="https://github.com/user-attachments/assets/cd7fa6f7-4a5f-4d66-8442-03527ca02510" />

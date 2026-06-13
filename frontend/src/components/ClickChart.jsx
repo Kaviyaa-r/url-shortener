@@ -1,83 +1,88 @@
-// Import React core library to render elements
 import React from 'react';
-// Import chart modules from the recharts plotting library
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-// Define the ClickChart component which renders click distributions
+const glassCard = {
+  background: 'rgba(255,255,255,0.03)',
+  backdropFilter: 'blur(20px)',
+  WebkitBackdropFilter: 'blur(20px)',
+  border: '1px solid rgba(255,255,255,0.08)',
+  borderTop: '1px solid rgba(255,255,255,0.15)',
+  borderRadius: '16px',
+  boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+  padding: '24px',
+};
+
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div style={{
+        background: 'rgba(30, 41, 59, 0.9)',
+        backdropFilter: 'blur(12px)',
+        border: '1px solid rgba(99,102,241,0.3)',
+        borderRadius: '12px',
+        padding: '12px 16px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+      }}>
+        <p style={{ color: '#94a3b8', fontSize: '13px', margin: '0 0 4px 0', fontWeight: 600 }}>{label}</p>
+        <p style={{ color: '#818cf8', fontSize: '16px', margin: 0, fontWeight: 800 }}>{payload[0].value} clicks</p>
+      </div>
+    );
+  }
+  return null;
+};
+
 const ClickChart = ({ data }) => {
-  // Check if click data is available and contains non-zero counts
   const hasData = data && data.some(item => item.count > 0);
 
   return (
-    // Outer card wrapper with dark backgrounds, margins, and border styles
-    <div className="bg-slate-800 border border-slate-700/60 rounded-xl p-6 shadow-lg">
-      {/* Title heading for click distributions */}
-      <h3 className="text-base font-bold text-white mb-6">Clicks (Last 7 Days)</h3>
+    <div style={glassCard}>
+      <h3 style={{ color: '#f1f5f9', fontSize: '16px', fontWeight: 700, margin: '0 0 24px 0', letterSpacing: '0.5px' }}>Click Trends — Last 7 Days</h3>
 
-      {/* Render chart layout if click data values exist */}
       {hasData ? (
-        // Chart container rendering dimensions
-        <div className="h-64 w-full">
-          {/* Responsive wrapper to automatically resize chart to parent box width */}
+        <div style={{ height: '280px', width: '100%' }}>
           <ResponsiveContainer width="100%" height="100%">
-            {/* Main BarChart component binding inputs */}
             <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              {/* Cartesian background grid lines styled with slate-700 */}
-              <CartesianGrid stroke="#334155" strokeDasharray="3 3" vertical={false} />
+              <CartesianGrid stroke="rgba(255,255,255,0.06)" strokeDasharray="3 3" vertical={false} />
               
-              {/* XAxis mapping weekdays (Mon, Tue) styled with slate-400 */}
               <XAxis
                 dataKey="date"
-                stroke="#94a3b8"
+                stroke="#64748b"
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
                 dy={10}
               />
               
-              {/* YAxis mapping count values styled with slate-400 */}
               <YAxis
-                stroke="#94a3b8"
+                stroke="#64748b"
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
                 allowDecimals={false}
               />
               
-              {/* Tooltip config customized to display inside dark boxes */}
               <Tooltip
-                contentStyle={{
-                  background: '#1e293b', // bg-slate-800
-                  border: '1px solid #334155', // border-slate-700
-                  borderRadius: '8px',
-                  color: '#ffffff',
-                }}
-                itemStyle={{ color: '#6366f1' }} // indigo-500
-                cursor={{ fill: 'rgba(99, 102, 241, 0.05)' }} // subtle indigo highlight
+                content={<CustomTooltip />}
+                cursor={{ fill: 'rgba(99, 102, 241, 0.05)' }}
               />
               
-              {/* Data bar rendering click count with rounded top corners */}
               <Bar
                 dataKey="count"
-                fill="#6366f1" // indigo-500
-                radius={[4, 4, 0, 0]} // rounded top caps
-                maxBarSize={40}
+                fill="#6366f1"
+                radius={[6, 6, 0, 0]}
+                maxBarSize={48}
               />
             </BarChart>
           </ResponsiveContainer>
         </div>
       ) : (
-        // Empty state message displayed if all clicks count value represents zero
-        <div className="h-64 w-full flex flex-col items-center justify-center bg-slate-900/30 rounded-lg border border-dashed border-slate-700">
-          {/* Warning notice text */}
-          <p className="text-sm text-slate-400 font-medium">No data yet</p>
-          {/* Visual sub-text helper */}
-          <p className="text-xs text-slate-500 mt-1">Visit your short link to generate tracking events.</p>
+        <div style={{ height: '280px', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', border: '1px dashed rgba(255,255,255,0.1)' }}>
+          <p style={{ color: '#f1f5f9', fontSize: '15px', fontWeight: 600, margin: '0 0 4px 0' }}>No clicks yet</p>
+          <p style={{ color: '#64748b', fontSize: '13px', margin: 0 }}>Share your link to see data here.</p>
         </div>
       )}
     </div>
   );
 };
 
-// Export the ClickChart component
 export default ClickChart;

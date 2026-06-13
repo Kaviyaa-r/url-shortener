@@ -1,69 +1,80 @@
-// Import the React library for rendering elements
 import React from 'react';
-// Import routing Link from react-router-dom to handle SPA navigation
 import { Link } from 'react-router-dom';
-// Import LinkIcon and LogOut icons from lucide-react library
-import { Link as LinkIcon, LogOut } from 'lucide-react';
-// Import the custom authentication hook to access current user context
+import { Link2, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-// Define the Navbar header component
+const gradientText = {
+  background: 'linear-gradient(90deg, #818cf8, #c084fc, #f472b6)',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  backgroundClip: 'text',
+};
+
 const Navbar = () => {
-  // Retrieve the active user object and logout handler function from auth context
   const { user, logout } = useAuth();
 
   return (
-    // Sticky layout header wrapper styled with dark slate backgrounds and borders
-    <header className="sticky top-0 z-50 w-full bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
-      {/* Centered navigation container setting max-width constraints */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Flexbox row layout mapping logo and actions to opposite sides */}
-        <div className="flex justify-between items-center h-16">
-          
-          {/* Logo container brand wrapper */}
-          <div className="flex items-center">
-            {/* Router link element routing back to home page */}
-            <Link to="/" className="flex items-center gap-2 group">
-              {/* Brand logo icon container */}
-              <div className="bg-indigo-600/10 p-2 rounded-lg group-hover:bg-indigo-600/20">
-                {/* Brand logo link icon */}
-                <LinkIcon className="h-5 w-5 text-indigo-400" />
-              </div>
-              {/* Brand name text identifier */}
-              <span className="text-xl font-black text-white tracking-wide">
-                Snap<span className="text-indigo-400">Link</span>
-              </span>
-            </Link>
-          </div>
-
-          {/* User profile action indicators section */}
-          <div className="flex items-center gap-4">
-            {/* Render user name display only if user data object exists */}
-            {user && (
-              // Name text label styled with light grey text colors
-              <span className="hidden sm:inline-block text-sm font-medium text-slate-300">
-                Hello, <span className="text-white font-semibold">{user.name}</span>
-              </span>
-            )}
-            
-            {/* Logout interactive trigger button */}
-            <button
-              // Bind click trigger to trigger the logout hook routine
-              onClick={logout}
-              className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-700 hover:border-red-500/50 rounded-lg text-xs font-semibold text-slate-300 hover:text-red-400 hover:bg-red-500/10"
-            >
-              {/* LogOut action icon */}
-              <LogOut className="h-3.5 w-3.5" />
-              {/* Button display label */}
-              <span>Sign Out</span>
-            </button>
-          </div>
-
+    <header style={{
+      background: 'rgba(6,8,24,0.8)',
+      backdropFilter: 'blur(20px)',
+      WebkitBackdropFilter: 'blur(20px)',
+      borderBottom: '1px solid rgba(255,255,255,0.06)',
+      padding: '16px 48px',
+      position: 'sticky',
+      top: 0,
+      zIndex: 100,
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    }}>
+      {/* Logo */}
+      <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
+        <div style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', padding: '8px', borderRadius: '10px', display: 'flex' }}>
+          <Link2 size={18} color="white" />
         </div>
+        <span style={{ ...gradientText, fontSize: '20px', fontWeight: 900 }}>SnapLink</span>
+      </Link>
+
+      {/* Right side */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+        {user && (
+          <span style={{ color: '#94a3b8', fontSize: '14px', fontWeight: 500 }}>
+            {user.name}
+          </span>
+        )}
+        <button
+          onClick={logout}
+          style={{
+            background: 'rgba(255,255,255,0.05)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: '10px',
+            color: '#94a3b8',
+            fontWeight: 600,
+            padding: '8px 16px',
+            cursor: 'pointer',
+            fontSize: '13px',
+            transition: 'all 0.3s ease',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.borderColor = 'rgba(239,68,68,0.4)';
+            e.currentTarget.style.color = '#ef4444';
+            e.currentTarget.style.background = 'rgba(239,68,68,0.08)';
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+            e.currentTarget.style.color = '#94a3b8';
+            e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+          }}
+        >
+          <LogOut size={14} />
+          Sign Out
+        </button>
       </div>
     </header>
   );
 };
 
-// Export the Navbar header component
 export default Navbar;
