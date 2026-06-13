@@ -21,6 +21,8 @@ Bonus Features
 📈 Click Trend Charts — Daily click bar chart per URL (last 7 days)
 🌐 Device & Browser Tracking — See what devices/browsers visitors use
 🎨 Glassmorphism UI — Modern dark aesthetic with frosted glass components, dynamic hover effects, and animated background orbs
+🎯 UTM Campaign Builder — Easily generate tracking links by appending UTM source, medium, and campaign parameters
+🎉 Success Confetti — A beautiful particle explosion on successful URL generation to delight users
 
 
 <img width="827" height="582" alt="image" src="https://github.com/user-attachments/assets/cd7fa6f7-4a5f-4d66-8442-03527ca02510" />

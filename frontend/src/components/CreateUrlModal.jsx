@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { X, Copy, Check, Loader2, Link as LinkIcon, Sparkles, CheckCircle } from 'lucide-react';
+import { X, Copy, Check, Loader2, Link as LinkIcon, Sparkles, CheckCircle, Target } from 'lucide-react';
 import axios from '../api/axios';
 import { toast } from 'react-hot-toast';
+import confetti from 'canvas-confetti';
 
 const glassCard = {
   background: 'rgba(255,255,255,0.03)',
@@ -74,6 +75,11 @@ const CreateUrlModal = ({ isOpen, onClose, onSuccess }) => {
   const [copied, setCopied] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
 
+  const [showUtm, setShowUtm] = useState(false);
+  const [utmSource, setUtmSource] = useState('');
+  const [utmMedium, setUtmMedium] = useState('');
+  const [utmCampaign, setUtmCampaign] = useState('');
+
   const validateUrl = (url) => {
     try {
       new URL(url);
@@ -98,9 +104,22 @@ const CreateUrlModal = ({ isOpen, onClose, onSuccess }) => {
 
     setLoading(true);
 
+    let finalUrl = originalUrl.trim();
+    if (utmSource || utmMedium || utmCampaign) {
+      try {
+        const urlObj = new URL(finalUrl);
+        if (utmSource) urlObj.searchParams.set('utm_source', utmSource.trim());
+        if (utmMedium) urlObj.searchParams.set('utm_medium', utmMedium.trim());
+        if (utmCampaign) urlObj.searchParams.set('utm_campaign', utmCampaign.trim());
+        finalUrl = urlObj.toString();
+      } catch (err) {
+        // Silently fail if URL parsing fails here, validation caught it earlier
+      }
+    }
+
     try {
       const payload = {
-        originalUrl: originalUrl.trim(),
+        originalUrl: finalUrl,
         customAlias: customAlias.trim() || undefined,
         expiresAt: expiresAt || undefined
       };
@@ -110,6 +129,12 @@ const CreateUrlModal = ({ isOpen, onClose, onSuccess }) => {
       if (response.data.success) {
         setSuccessData(response.data.data);
         toast.success('URL shortened successfully!');
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#6366f1', '#8b5cf6', '#ec4899', '#10b981']
+        });
         if (onSuccess) onSuccess();
       } else {
         setErrorMsg(response.data.error || 'Failed to shorten URL');
@@ -137,6 +162,7 @@ const CreateUrlModal = ({ isOpen, onClose, onSuccess }) => {
 
   const handleReset = () => {
     setOriginalUrl(''); setCustomAlias(''); setExpiresAt('');
+    setUtmSource(''); setUtmMedium(''); setUtmCampaign(''); setShowUtm(false);
     setSuccessData(null); setCopied(false); setErrorMsg('');
   };
 
@@ -205,6 +231,39 @@ const CreateUrlModal = ({ isOpen, onClose, onSuccess }) => {
                   onFocus={() => setFocusedField('date')} onBlur={() => setFocusedField(null)}
                   style={inputStyle('date')} />
               </div>
+
+              {/* UTM Toggle */}
+              <div style={{ marginBottom: '24px' }}>
+                <button 
+                  type="button" 
+                  onClick={() => setShowUtm(!showUtm)}
+                  style={{ background: 'none', border: 'none', color: '#818cf8', fontSize: '13px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', padding: 0, transition: 'all 0.2s ease' }}
+                  onMouseEnter={e => e.currentTarget.style.color = '#c084fc'}
+                  onMouseLeave={e => e.currentTarget.style.color = '#818cf8'}
+                >
+                  <Target size={16} /> {showUtm ? 'Hide Advanced Tracking (UTMs)' : 'Add Advanced Tracking (UTMs)'}
+                </button>
+              </div>
+
+              {/* UTM Inputs */}
+              {showUtm && (
+                <div style={{ background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', padding: '16px', marginBottom: '24px', animation: 'fadeIn 0.3s ease' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+                    <div>
+                      <label style={{ display: 'block', color: '#94a3b8', fontSize: '12px', fontWeight: 600, marginBottom: '6px' }}>UTM Source</label>
+                      <input type="text" value={utmSource} onChange={e => setUtmSource(e.target.value)} onFocus={() => setFocusedField('utmSource')} onBlur={() => setFocusedField(null)} style={{ ...inputStyle('utmSource'), padding: '10px 14px', fontSize: '13px' }} placeholder="twitter, newsletter" />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', color: '#94a3b8', fontSize: '12px', fontWeight: 600, marginBottom: '6px' }}>UTM Medium</label>
+                      <input type="text" value={utmMedium} onChange={e => setUtmMedium(e.target.value)} onFocus={() => setFocusedField('utmMedium')} onBlur={() => setFocusedField(null)} style={{ ...inputStyle('utmMedium'), padding: '10px 14px', fontSize: '13px' }} placeholder="social, email" />
+                    </div>
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', color: '#94a3b8', fontSize: '12px', fontWeight: 600, marginBottom: '6px' }}>UTM Campaign</label>
+                    <input type="text" value={utmCampaign} onChange={e => setUtmCampaign(e.target.value)} onFocus={() => setFocusedField('utmCampaign')} onBlur={() => setFocusedField(null)} style={{ ...inputStyle('utmCampaign'), padding: '10px 14px', fontSize: '13px' }} placeholder="summer_sale_2024" />
+                  </div>
+                </div>
+              )}
 
               {errorMsg && (
                 <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444', padding: '12px', borderRadius: '10px', fontSize: '13px', marginBottom: '24px', fontWeight: 500 }}>
