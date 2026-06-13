@@ -1,0 +1,42 @@
+/* Import Tailwind base layer styles */
+@tailwind base;
+/* Import Tailwind custom component styles */
+@tailwind components;
+/* Import Tailwind utility styles */
+@tailwind utilities;
+
+/* Apply global styles to HTML elements */
+@layer base {
+  /* Set standard HTML transition behaviors and focus outline controls */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Apply smooth transition animations to all interactive items */
+  button, a, input, select, textarea {
+    @apply transition-all duration-200 ease-in-out;
+  }
+
+  /* Custom styling for the scrollbars */
+  /* Scrollbar track lane width configuration */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  /* Scrollbar track background styling (matches slate-900) */
+  ::-webkit-scrollbar-track {
+    background: #0f172a;
+  }
+  
+  /* Scrollbar draggable thumb styling (matches slate-700 with rounded corners) */
+  ::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 4px;
+  }
+  
+  /* Scrollbar draggable thumb hover background styling (matches slate-400) */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+  }
+}
