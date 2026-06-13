@@ -113,7 +113,14 @@ React Context for auth — Avoids Redux complexity while giving global auth stat
 
 
 📸 Sample Output
-(Screenshots and DB entries to be added after final deployment)
+DB entries
+<img width="1888" height="862" alt="Screenshot 2026-06-13 162438" src="https://github.com/user-attachments/assets/52dbdd14-9190-4432-bb86-ae692e079afd" />
+<img width="1871" height="898" alt="Screenshot 2026-06-13 162501" src="https://github.com/user-attachments/assets/b8d7ed15-8d20-4b5d-8f70-94d38fb9b126" />
+<img width="1915" height="902" alt="Screenshot 2026-06-13 162515" src="https://github.com/user-attachments/assets/d4f95e06-6790-4e84-8878-d98db744c03c" />
+<img width="1871" height="908" alt="Screenshot 2026-06-13 162530" src="https://github.com/user-attachments/assets/55c46c19-093b-4b68-9b3d-94b09a6a1708" />
+<img width="1863" height="876" alt="Screenshot 2026-06-13 162544" src="https://github.com/user-attachments/assets/38c4affd-a304-414c-9426-f1ba544a627b" />
+<img width="1863" height="876" alt="image" src="https://github.com/user-attachments/assets/894e5bad-011e-4009-892a-af389516ec63" />
+
 
 🌐 Live Demo
 🚀 Live App ← (Add deployment URL if applicable)
