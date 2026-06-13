@@ -115,6 +115,16 @@ React Context for auth — Avoids Redux complexity while giving global auth stat
 
 
 📸 Sample Output
+<img width="1913" height="937" alt="Screenshot 2026-06-13 175026" src="https://github.com/user-attachments/assets/7760c251-e581-4866-81cb-a9ff7b727ea1" />
+<img width="1902" height="922" alt="Screenshot 2026-06-13 175049" src="https://github.com/user-attachments/assets/04746aef-7ae9-4606-bb34-2fad6b4227a0" />
+<img width="1902" height="900" alt="Screenshot 2026-06-13 175107" src="https://github.com/user-attachments/assets/627e3380-1c24-44c5-a3b8-35a6f2bbecfe" />
+<img width="1912" height="927" alt="Screenshot 2026-06-13 175242" src="https://github.com/user-attachments/assets/2b82050c-2bf3-4217-a6e4-63d07607bf34" />
+<img width="1895" height="893" alt="Screenshot 2026-06-13 175304" src="https://github.com/user-attachments/assets/837119d5-a859-4412-92b7-b0199ca5aece" />
+<img width="1912" height="896" alt="Screenshot 2026-06-13 175437" src="https://github.com/user-attachments/assets/067632a5-54b0-459a-a103-e59f172dbaa2" />
+<img width="1912" height="932" alt="Screenshot 2026-06-13 175455" src="https://github.com/user-attachments/assets/61158f8d-6b36-4bd0-8080-c367b783556b" />
+<img width="1896" height="900" alt="Screenshot 2026-06-13 175553" src="https://github.com/user-attachments/assets/bf40aa33-6804-4f17-894b-a0a37fe04449" />
+<img width="1901" height="942" alt="Screenshot 2026-06-13 175616" src="https://github.com/user-attachments/assets/1d71eed9-aa08-49cc-84c0-1ab8cb3817c8" />
+
 DB entries
 <img width="1888" height="862" alt="Screenshot 2026-06-13 162438" src="https://github.com/user-attachments/assets/52dbdd14-9190-4432-bb86-ae692e079afd" />
 <img width="1871" height="898" alt="Screenshot 2026-06-13 162501" src="https://github.com/user-attachments/assets/b8d7ed15-8d20-4b5d-8f70-94d38fb9b126" />
