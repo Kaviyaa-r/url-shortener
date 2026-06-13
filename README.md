@@ -125,7 +125,8 @@ DB entries
 
 
 🌐 Live Demo
-🚀 Live App ← (Add deployment URL if applicable)
+🚀 Live App ← (https://agent-6a2d48e27730e1d--sensational-cocada-ec78e5.netlify.app/)
+
 
 This project is a part of a hackathon run by https://katomaran.com
 
