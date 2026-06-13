@@ -52,8 +52,7 @@ const urlSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Explicitly define index on shortCode for fast lookup
-urlSchema.index({ shortCode: 1 });
+// Note: shortCode index is created automatically by unique:true above — no duplicate needed
 
 // Explicitly define compound index on user and createdAt (for sorting newest first on dashboard)
 urlSchema.index({ user: 1, createdAt: -1 });
